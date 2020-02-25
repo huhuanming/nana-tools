@@ -5,7 +5,7 @@ const xlsx = require("node-xlsx").default;
 // const folderPath = process.argv.pop();
 
 const sourceFilePath = '/Users/huanminghu/Library/Containers/com.tencent.xinWeChat/Data/Library/Application\ Support/com.tencent.xinWeChat/2.0b4.0.9/76baac86150b63d88137e22b38c746f8/Message/MessageTemp/b76931d9ba7ea39622c94275c86872c1/File/推月聚流-关联医院.xlsx';
-const folderPath = '/Users/huanminghu/Library/Containers/com.tencent.xinWeChat/Data/Library/Application\ Support/com.tencent.xinWeChat/2.0b4.0.9/76baac86150b63d88137e22b38c746f8/Message/MessageTemp/b76931d9ba7ea39622c94275c86872c1/File/split-15-47';
+const folderPath = '/Users/huanminghu/Library/Containers/com.tencent.xinWeChat/Data/Library/Application\ Support/com.tencent.xinWeChat/2.0b4.0.9/76baac86150b63d88137e22b38c746f8/Message/MessageTemp/b76931d9ba7ea39622c94275c86872c1/File/replace-name-15-47';
 
 const workSheets = xlsx.parse(sourceFilePath);
 const nameMaps = {}
@@ -29,6 +29,14 @@ const logs = [
     }
 ]
 
+const checkName = (name, key, value) => {
+    const editName = name.replace('整形', '')
+    if (editName.includes(key) || key.includes(editName) || value.includes(editName)) {
+        return true
+    }
+    return name.includes(key) || key.includes(name) || value.includes(name)
+}
+
 files.forEach((fileName) => {
     if (fileName.includes('.xlsx')) {
         const filPath = `${folderPath}\/${fileName}`
@@ -37,14 +45,16 @@ files.forEach((fileName) => {
             if (index > 0) {
                 const name = (sheets[0].data[index][2] || '').trim()
                 if (name) {
+                    let matchKey = ''
                     nameKeys.forEach((key) => {
-                        if(name.includes(key) || key.includes(name) || nameMaps[key].includes(name)) {
+                        if(checkName(name, key, nameMaps[key])) {
+                            matchKey = nameMaps[key]
                             sheets[0].data[index][2] = nameMaps[key]
                             return false;
                         }
                     })
     
-                    if (name === sheets[0].data[index][2]) {
+                    if (name !==  matchKey && name === sheets[0].data[index][2].trim()) {
                         logs[0].data.push([
                             fileName,
                             `${index} 行`,
