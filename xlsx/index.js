@@ -34,6 +34,7 @@ const splitExcel = path => {
       if (line[2] && ~line[2].indexOf("\n")) {
         line[2].split("\n").forEach(text => {
           if (text !== "") {
+            text = text.replace(/:/g, '&')
             text = text.replace(/；/g, ';')
             text = text.replace(/：/g, ':')
             const splits = text.split(";");
@@ -44,8 +45,8 @@ const splitExcel = path => {
               0,
               splits[1].trim().split(":")[1],
               splits[2].trim().split(":")[1],
-              splits[3].trim().split(":")[1],
-              splits[4].trim().split(":")[1]
+              splits[3].trim().split(":")[1].replace(/&/g, ':'),
+              splits[4].trim().split(":")[1].replace(/&/g, ':'),
             );
           }
         });
